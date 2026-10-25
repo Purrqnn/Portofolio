@@ -1,0 +1,2403 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Portofolio Desain — Poster, Jersey, Produk</title>
+
+    <!-- Google Fonts: Inter Tight (Display & UI) + JetBrains Mono (HUD Telemetry) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN for utility support Alongside Custom Architectural CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        /* ==========================================================================
+           1. DESIGN TOKENS & THEME ENGINE (OBSIDIAN DARK & SWISS PAPER LIGHT)
+           ========================================================================== */
+        
+         :root {
+            /* Default: Igloo Obsidian Dark Mode */
+            --bg-primary: #060608;
+            --bg-elevated: #0d0e12;
+            --bg-glass: rgba(13, 14, 18, 0.72);
+            --bg-card: rgba(18, 19, 24, 0.68);
+            --fg-primary: #f4f4f6;
+            --fg-secondary: #9496a1;
+            --fg-muted: #565864;
+            --accent: #e30613;
+            --accent-glow: rgba(227, 6, 19, 0.32);
+            --accent-soft: rgba(227, 6, 19, 0.12);
+            --status-green: #10b981;
+            --line-hairline: rgba(244, 244, 246, 0.11);
+            --line-strong: rgba(244, 244, 246, 0.28);
+            --tile-bg: #111217;
+            --grid-particle: rgba(244, 244, 246, 0.16);
+            --shadow-card: 0 30px 60px -15px rgba(0, 0, 0, 0.75);
+            --font-display: 'Inter Tight', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --hud-pad: clamp(14px, 2.2vw, 28px);
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+         :root[data-theme="light"] {
+            --bg-primary: #f4f3ef;
+            --bg-elevated: #eae8e1;
+            --bg-glass: rgba(244, 243, 239, 0.82);
+            --bg-card: rgba(255, 255, 255, 0.78);
+            --fg-primary: #090a0c;
+            --fg-secondary: #494b54;
+            --fg-muted: #7e808a;
+            --accent: #e30613;
+            --accent-glow: rgba(227, 6, 19, 0.22);
+            --accent-soft: rgba(227, 6, 19, 0.08);
+            --status-green: #059669;
+            --line-hairline: rgba(9, 10, 12, 0.12);
+            --line-strong: rgba(9, 10, 12, 0.85);
+            --tile-bg: #e6e4dc;
+            --grid-particle: rgba(9, 10, 12, 0.18);
+            --shadow-card: 0 24px 48px -12px rgba(9, 10, 12, 0.12);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+            background-color: var(--bg-primary);
+            color: var(--fg-primary);
+            font-family: var(--font-display);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            selection-background-color: var(--accent);
+        }
+        
+         ::selection {
+            background: var(--accent);
+            color: #ffffff;
+        }
+        
+        body {
+            background-color: var(--bg-primary);
+            color: var(--fg-primary);
+            overflow-x: hidden;
+            transition: background-color 0.5s var(--ease-out-expo), color 0.5s var(--ease-out-expo);
+        }
+        /* ==========================================================================
+           2. INTERACTIVE BACKGROUND CANVAS & NOISE OVERLAY
+           ========================================================================== */
+        
+        #bg-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        .noise-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.035;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+        /* ==========================================================================
+           3. IGLOO.INC FIXED ARCHITECTURAL HUD FRAME
+           ========================================================================== */
+        
+        .hud-frame {
+            position: fixed;
+            inset: var(--hud-pad);
+            border: 1px solid var(--line-hairline);
+            pointer-events: none;
+            z-index: 40;
+            transition: border-color 0.4s ease;
+        }
+        /* Corner Crosshairs (+) */
+        
+        .hud-crosshair {
+            position: absolute;
+            width: 11px;
+            height: 11px;
+            pointer-events: none;
+        }
+        
+        .hud-crosshair::before,
+        .hud-crosshair::after {
+            content: '';
+            position: absolute;
+            background: var(--fg-primary);
+            opacity: 0.65;
+        }
+        
+        .hud-crosshair::before {
+            top: 5px;
+            left: 0;
+            width: 11px;
+            height: 1px;
+        }
+        
+        .hud-crosshair::after {
+            top: 0;
+            left: 5px;
+            width: 1px;
+            height: 11px;
+        }
+        
+        .hud-tl {
+            top: -6px;
+            left: -6px;
+        }
+        
+        .hud-tr {
+            top: -6px;
+            right: -6px;
+        }
+        
+        .hud-bl {
+            bottom: -6px;
+            left: -6px;
+        }
+        
+        .hud-br {
+            bottom: -6px;
+            right: -6px;
+        }
+        /* Top HUD Navigation Bar */
+        
+        .hud-header {
+            position: fixed;
+            top: var(--hud-pad);
+            left: var(--hud-pad);
+            right: var(--hud-pad);
+            height: 58px;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--line-hairline);
+        }
+        
+        .brand-cluster {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            pointer-events: auto;
+        }
+        
+        .brand-logo {
+            font-weight: 800;
+            font-size: 16px;
+            letter-spacing: -0.02em;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .brand-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 12px var(--accent);
+        }
+        
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid var(--line-hairline);
+            font-family: var(--font-mono);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--fg-secondary);
+            background: rgba(255, 255, 255, 0.02);
+        }
+        
+        .status-led {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--status-green);
+            box-shadow: 0 0 8px var(--status-green);
+            animation: pulseLed 2s infinite ease-in-out;
+        }
+        
+        @keyframes pulseLed {
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.45;
+                transform: scale(0.85);
+            }
+        }
+        /* Section Pills Nav */
+        
+        .hud-nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            pointer-events: auto;
+        }
+        
+        .hud-nav a {
+            position: relative;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: var(--fg-secondary);
+            padding: 7px 12px;
+            border-radius: 6px;
+            transition: all 0.25s var(--ease-out-expo);
+        }
+        
+        .hud-nav a .nav-num {
+            color: var(--fg-muted);
+            margin-right: 4px;
+            font-size: 10px;
+        }
+        
+        .hud-nav a:hover {
+            color: var(--fg-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .hud-nav a.active {
+            color: var(--fg-primary);
+            background: var(--accent-soft);
+            border: 1px solid rgba(227, 6, 19, 0.35);
+        }
+        
+        .hud-nav a.active .nav-num {
+            color: var(--accent);
+            font-weight: 700;
+        }
+        /* Right HUD Controls */
+        
+        .hud-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            pointer-events: auto;
+        }
+        
+        .hud-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: transparent;
+            border: 1px solid var(--line-hairline);
+            color: var(--fg-secondary);
+            font-family: var(--font-mono);
+            font-size: 11px;
+            padding: 6px 11px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .hud-btn:hover {
+            color: var(--fg-primary);
+            border-color: var(--fg-secondary);
+            background: rgba(255, 255, 255, 0.04);
+        }
+        /* Bottom HUD Telemetry Bar */
+        
+        .hud-footer {
+            position: fixed;
+            bottom: var(--hud-pad);
+            left: var(--hud-pad);
+            right: var(--hud-pad);
+            height: 44px;
+            z-index: 45;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-top: 1px solid var(--line-hairline);
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--fg-secondary);
+            letter-spacing: 0.06em;
+            pointer-events: none;
+        }
+        
+        .hud-footer-left,
+        .hud-footer-center,
+        .hud-footer-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            pointer-events: auto;
+        }
+        
+        .scroll-meter {
+            width: 90px;
+            height: 3px;
+            background: var(--line-hairline);
+            border-radius: 99px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .scroll-meter-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            transition: width 0.1s linear;
+        }
+        /* Right Side Chapter Rail */
+        
+        .chapter-rail {
+            position: fixed;
+            right: calc(var(--hud-pad) + 18px);
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 45;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .rail-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            border: 1px solid var(--fg-muted);
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s var(--ease-out-expo);
+            position: relative;
+        }
+        
+        .rail-dot:hover {
+            border-color: var(--fg-primary);
+            transform: scale(1.25);
+        }
+        
+        .rail-dot.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+            height: 24px;
+            border-radius: 99px;
+        }
+        /* ==========================================================================
+           4. SECTION ARCHITECTURE (IGLOO PER-SECTION SYSTEM)
+           ========================================================================== */
+        
+        main {
+            position: relative;
+            z-index: 10;
+        }
+        
+        .igloo-section {
+            min-height: 100vh;
+            width: 100%;
+            padding: calc(var(--hud-pad) + 84px) calc(var(--hud-pad) + 32px) calc(var(--hud-pad) + 68px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            border-bottom: 1px solid var(--line-hairline);
+        }
+        
+        .section-container {
+            max-width: 1320px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        /* Architectural 12-Column Swiss Grid */
+        
+        .swiss-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+        }
+        /* Section Index Header (Left Column Telemetry) */
+        
+        .sec-meta {
+            grid-column: 1 / 4;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-right: 1px solid var(--line-hairline);
+            padding-right: 20px;
+        }
+        
+        .sec-index-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+        
+        .sec-index-title {
+            font-weight: 800;
+            font-size: 22px;
+            letter-spacing: -0.02em;
+            color: var(--fg-primary);
+            margin-bottom: 8px;
+        }
+        
+        .sec-index-desc {
+            font-size: 14px;
+            color: var(--fg-secondary);
+            line-height: 1.55;
+        }
+        
+        .sec-spec-box {
+            margin-top: 32px;
+            padding-top: 16px;
+            border-top: 1px dashed var(--line-hairline);
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--fg-muted);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .sec-body {
+            grid-column: 4 / 13;
+            padding-left: 16px;
+        }
+        /* ==========================================================================
+           5. SECTION 01: HERO MANIFESTO
+           ========================================================================== */
+        
+        .hero-tag-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--fg-secondary);
+        }
+        
+        .hero-tag {
+            padding: 5px 12px;
+            border: 1px solid var(--line-hairline);
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+        
+        .hero-title {
+            font-weight: 800;
+            font-size: clamp(58px, 11vw, 158px);
+            line-height: 0.86;
+            letter-spacing: -0.045em;
+            text-transform: uppercase;
+            margin-bottom: 36px;
+        }
+        
+        .hero-title .word-line {
+            display: block;
+            transition: transform 0.4s var(--ease-out-expo), color 0.3s ease;
+        }
+        
+        .hero-title .word-line:hover {
+            transform: translateX(12px);
+        }
+        
+        .hero-title .accent-dot {
+            color: var(--accent);
+            display: inline-block;
+        }
+        
+        .hero-title .stroke-word {
+            color: transparent;
+            -webkit-text-stroke: 2px var(--fg-primary);
+            transition: all 0.35s ease;
+        }
+        
+        .hero-title .stroke-word:hover {
+            color: var(--fg-primary);
+            -webkit-text-stroke: 0px transparent;
+        }
+        
+        .hero-bottom-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+            padding-top: 32px;
+            border-top: 1px solid var(--line-strong);
+            align-items: end;
+        }
+        
+        .hero-lead {
+            grid-column: 1 / 7;
+            font-size: clamp(18px, 2vw, 24px);
+            line-height: 1.38;
+            font-weight: 500;
+            color: var(--fg-primary);
+            letter-spacing: -0.01em;
+        }
+        
+        .hero-stats {
+            grid-column: 7 / 10;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            border-left: 1px solid var(--line-hairline);
+            padding-left: 20px;
+        }
+        
+        .stat-item b {
+            display: block;
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: var(--fg-primary);
+        }
+        
+        .stat-item span {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--fg-secondary);
+        }
+        
+        .hero-cta-wrap {
+            grid-column: 10 / 13;
+            display: flex;
+            justify-content: flex-end;
+        }
+        /* High-Craft Magnetic CTA Button */
+        
+        .btn-igloo {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            background: var(--accent);
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: -0.01em;
+            padding: 18px 26px;
+            border-radius: 6px;
+            text-decoration: none;
+            overflow: hidden;
+            border: 1px solid var(--accent);
+            box-shadow: 0 12px 32px var(--accent-glow);
+            transition: all 0.3s var(--ease-out-expo);
+            cursor: pointer;
+        }
+        
+        .btn-igloo:hover {
+            background: var(--fg-primary);
+            color: var(--bg-primary);
+            border-color: var(--fg-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+        }
+        
+        .btn-igloo .btn-arrow {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            transition: transform 0.3s var(--ease-out-expo);
+        }
+        
+        .btn-igloo:hover .btn-arrow {
+            transform: translate(3px, -3px);
+        }
+        /* ==========================================================================
+           6. SECTION 02: KARYA PILIHAN (3D ARTIFACT CARDS & BLUEPRINT MODE)
+           ========================================================================== */
+        
+        .sec-heading-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 16px;
+            margin-bottom: 36px;
+        }
+        
+        .sec-h2 {
+            font-weight: 800;
+            font-size: clamp(32px, 4.2vw, 56px);
+            line-height: 0.96;
+            letter-spacing: -0.035em;
+        }
+        
+        .works-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            perspective: 1200px;
+        }
+        
+        .artifact-card {
+            position: relative;
+            background: var(--bg-card);
+            border: 1px solid var(--line-hairline);
+            border-radius: 10px;
+            padding: 16px;
+            transition: transform 0.2s ease-out, border-color 0.3s ease, box-shadow 0.3s ease;
+            transform-style: preserve-3d;
+            cursor: pointer;
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+        }
+        
+        .artifact-card:hover {
+            border-color: var(--accent);
+            box-shadow: var(--shadow-card);
+        }
+        /* Specular Glare Effect on Hover */
+        
+        .artifact-glare {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.14), transparent 60%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 5;
+        }
+        
+        .artifact-card:hover .artifact-glare {
+            opacity: 1;
+        }
+        
+        .artifact-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--fg-secondary);
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--line-hairline);
+            letter-spacing: 0.08em;
+        }
+        
+        .artifact-figure {
+            aspect-ratio: 3 / 4;
+            background: var(--tile-bg);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 14px;
+            border: 1px solid var(--line-hairline);
+        }
+        
+        .artifact-figure svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+            transition: transform 0.6s var(--ease-out-expo);
+        }
+        
+        .artifact-card:hover .artifact-figure svg {
+            transform: scale(1.03);
+        }
+        /* Blueprint Mode Overlay inside SVG when toggled */
+        
+        body.blueprint-mode .artifact-figure svg {
+            filter: invert(0.92) hue-rotate(180deg) contrast(1.15);
+        }
+        
+        .artifact-inspect-pill {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: rgba(6, 6, 8, 0.85);
+            color: #fff;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            opacity: 0;
+            transform: translateY(6px);
+            transition: all 0.25s ease;
+        }
+        
+        .artifact-card:hover .artifact-inspect-pill {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .artifact-caption {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding-top: 8px;
+            border-top: 2px solid var(--fg-primary);
+        }
+        
+        .artifact-title {
+            font-weight: 800;
+            font-size: 18px;
+            letter-spacing: -0.02em;
+        }
+        
+        .artifact-sub {
+            font-size: 13px;
+            color: var(--fg-secondary);
+            margin-top: 2px;
+        }
+        
+        .artifact-year {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--accent);
+            background: var(--accent-soft);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        /* ==========================================================================
+           7. SECTION 03: DAFTAR HARGA (INTERACTIVE LEDGER & CONFIGURATOR)
+           ========================================================================== */
+        
+        .ledger-table {
+            border-top: 2px solid var(--fg-primary);
+            border-bottom: 2px solid var(--fg-primary);
+        }
+        
+        .ledger-row {
+            display: grid;
+            grid-template-columns: 0.8fr 2.5fr 4fr 2fr 1.4fr;
+            gap: 16px;
+            padding: 22px 16px;
+            border-bottom: 1px solid var(--line-hairline);
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.25s var(--ease-out-expo);
+            position: relative;
+        }
+        
+        .ledger-row:last-child {
+            border-bottom: none;
+        }
+        
+        .ledger-row:hover {
+            background: rgba(227, 6, 19, 0.05);
+            padding-left: 24px;
+        }
+        
+        .ledger-row.selected {
+            background: var(--accent-soft);
+            border-left: 4px solid var(--accent);
+            padding-left: 22px;
+        }
+        
+        .ledger-code {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--fg-muted);
+        }
+        
+        .ledger-row.selected .ledger-code {
+            color: var(--accent);
+            font-weight: 700;
+        }
+        
+        .ledger-name {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+        
+        .ledger-desc {
+            font-size: 15px;
+            color: var(--fg-secondary);
+        }
+        
+        .ledger-price {
+            font-family: var(--font-mono);
+            font-size: 20px;
+            font-weight: 700;
+            text-align: right;
+            color: var(--fg-primary);
+        }
+        
+        .ledger-action {
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .select-badge {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: 1px solid var(--line-strong);
+            transition: all 0.2s ease;
+        }
+        
+        .ledger-row.selected .select-badge {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+        /* Interactive Live Order Estimator Dock */
+        
+        .estimator-bar {
+            margin-top: 24px;
+            padding: 20px 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--line-strong);
+            border-radius: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            backdrop-filter: blur(12px);
+        }
+        
+        .rev-stepper {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg-primary);
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--line-hairline);
+        }
+        
+        .rev-btn {
+            width: 26px;
+            height: 26px;
+            border-radius: 4px;
+            border: 1px solid var(--line-hairline);
+            background: transparent;
+            color: var(--fg-primary);
+            font-family: var(--font-mono);
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .rev-btn:hover {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+        /* ==========================================================================
+           8. SECTION 04: CARA ORDER (4-STAGE PROTOCOL MATRIX)
+           ========================================================================== */
+        
+        .protocol-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+        
+        .protocol-card {
+            background: var(--bg-card);
+            border: 1px solid var(--line-hairline);
+            border-top: 3px solid var(--fg-primary);
+            border-radius: 0 0 8px 8px;
+            padding: 24px 20px;
+            position: relative;
+            transition: all 0.3s var(--ease-out-expo);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 250px;
+        }
+        
+        .protocol-card:hover {
+            border-top-color: var(--accent);
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-card);
+        }
+        
+        .protocol-num {
+            font-size: 54px;
+            font-weight: 800;
+            line-height: 0.9;
+            color: var(--accent);
+            letter-spacing: -0.04em;
+            margin-bottom: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .protocol-tag {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--fg-muted);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+        
+        .protocol-text {
+            font-size: 16px;
+            line-height: 1.5;
+            color: var(--fg-primary);
+            font-weight: 500;
+        }
+        
+        .protocol-foot {
+            margin-top: 20px;
+            padding-top: 12px;
+            border-top: 1px dashed var(--line-hairline);
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--fg-secondary);
+            text-transform: uppercase;
+        }
+        /* ==========================================================================
+           9. SECTION 05: KONTAK & DIRECT TRANSMISSION PORTAL
+           ========================================================================== */
+        
+        .contact-portal {
+            background: var(--bg-card);
+            border: 1px solid var(--line-strong);
+            border-radius: 12px;
+            padding: clamp(28px, 4vw, 52px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .big-wa-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 20px;
+            font-size: clamp(32px, 5.5vw, 76px);
+            font-weight: 800;
+            letter-spacing: -0.035em;
+            line-height: 1;
+            text-decoration: none;
+            color: var(--fg-primary);
+            border-bottom: 6px solid var(--accent);
+            padding-bottom: 10px;
+            margin: 16px 0 36px;
+            transition: all 0.3s var(--ease-out-expo);
+        }
+        
+        .big-wa-link:hover {
+            color: var(--accent);
+            padding-left: 14px;
+        }
+        
+        .contact-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            padding-top: 28px;
+            border-top: 1px solid var(--line-hairline);
+        }
+        
+        .contact-box {
+            padding: 16px;
+            border: 1px solid var(--line-hairline);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.015);
+        }
+        
+        .contact-box-label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--fg-muted);
+            margin-bottom: 6px;
+        }
+        
+        .contact-box-val {
+            font-size: 17px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        /* ==========================================================================
+           10. MODALS (ARTIFACT INSPECTOR & STUDIO CUSTOMIZER)
+           ========================================================================== */
+        
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: rgba(5, 5, 8, 0.86);
+            backdrop-filter: blur(18px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        
+        .modal-backdrop.open {
+            display: flex;
+        }
+        
+        .modal-window {
+            background: var(--bg-elevated);
+            border: 1px solid var(--line-strong);
+            border-radius: 12px;
+            max-width: 920px;
+            width: 100%;
+            overflow: hidden;
+            box-shadow: 0 40px 90px rgba(0, 0, 0, 0.85);
+            animation: modalIn 0.35s var(--ease-out-expo);
+        }
+        
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        /* Scroll Reveal Utility */
+        
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.8s var(--ease-out-expo), transform 0.8s var(--ease-out-expo);
+        }
+        
+        .reveal-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* Toast Notification */
+        
+        #hud-toast {
+            position: fixed;
+            bottom: calc(var(--hud-pad) + 60px);
+            right: calc(var(--hud-pad) + 20px);
+            z-index: 90;
+            background: var(--fg-primary);
+            color: var(--bg-primary);
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 12px 18px;
+            border-radius: 6px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+            transform: translateY(20px);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s var(--ease-out-expo);
+        }
+        
+        #hud-toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        /* ==========================================================================
+           11. RESPONSIVE BREAKPOINTS (MOBILE & TABLET)
+           ========================================================================== */
+        
+        @media (max-width: 1024px) {
+            .sec-meta {
+                grid-column: 1 / 13;
+                border-right: none;
+                border-bottom: 1px solid var(--line-hairline);
+                padding-right: 0;
+                padding-bottom: 20px;
+                margin-bottom: 20px;
+            }
+            .sec-body {
+                grid-column: 1 / 13;
+                padding-left: 0;
+            }
+            .works-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .protocol-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .hero-lead {
+                grid-column: 1 / 13;
+            }
+            .hero-stats {
+                grid-column: 1 / 8;
+                border-left: none;
+                padding-left: 0;
+            }
+            .hero-cta-wrap {
+                grid-column: 8 / 13;
+            }
+            .chapter-rail {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+             :root {
+                --hud-pad: 8px;
+            }
+            .hud-header {
+                padding: 0 12px;
+                height: 52px;
+            }
+            .status-pill,
+            .hud-footer-center {
+                display: none;
+            }
+            .hud-nav {
+                overflow-x: auto;
+                max-width: 52vw;
+                scrollbar-width: none;
+            }
+            .hud-nav::-webkit-scrollbar {
+                display: none;
+            }
+            .hud-nav a {
+                padding: 5px 8px;
+                font-size: 10px;
+                white-space: nowrap;
+            }
+            .igloo-section {
+                padding: 80px 18px 72px;
+            }
+            .works-grid,
+            .protocol-grid,
+            .contact-meta-grid {
+                grid-template-columns: 1fr;
+            }
+            .ledger-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                padding: 18px 12px;
+            }
+            .ledger-price,
+            .ledger-action {
+                text-align: left;
+                justify-content: flex-start;
+            }
+            .hero-stats,
+            .hero-cta-wrap {
+                grid-column: 1 / 13;
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 1. INTERACTIVE 3D/PARTICLE GRID CANVAS BACKDROP (IGLOO.INC VIBE) -->
+    <canvas id="bg-canvas" aria-hidden="true"></canvas>
+    <div class="noise-overlay" aria-hidden="true"></div>
+
+    <!-- 2. ARCHITECTURAL HUD FRAME & CORNER CROSSHAIRS -->
+    <div class="hud-frame" aria-hidden="true">
+        <div class="hud-crosshair hud-tl"></div>
+        <div class="hud-crosshair hud-tr"></div>
+        <div class="hud-crosshair hud-bl"></div>
+        <div class="hud-crosshair hud-br"></div>
+    </div>
+
+    <!-- 3. TOP FIXED HUD BAR -->
+    <header class="hud-header">
+        <div class="brand-cluster">
+            <a href="#intro" class="brand-logo" id="brand-trigger" title="Klik untuk ganti Nama Studio & Nomor WA">
+                <span class="brand-dot"></span>
+                <span id="studio-name-display">FATH STUDIO</span>
+            </a>
+            <div class="status-pill">
+                <span class="status-led"></span>
+                <span>OPEN COMMISSION // 2026</span>
+            </div>
+        </div>
+
+        <nav class="hud-nav" aria-label="Navigasi Section">
+            <a href="#intro" class="active" data-sec="01"><span class="nav-num">01</span>Intro</a>
+            <a href="#karya" data-sec="02"><span class="nav-num">02</span>Karya</a>
+            <a href="#harga" data-sec="03"><span class="nav-num">03</span>Harga</a>
+            <a href="#cara" data-sec="04"><span class="nav-num">04</span>Cara Order</a>
+            <a href="#kontak" data-sec="05"><span class="nav-num">05</span>Kontak</a>
+        </nav>
+
+        <button type="button" class="hud-btn" id="theme-toggle" title="Ganti Tema (Dark / Light)">
+                <span id="theme-label">◐ LIGHT</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- 4. RIGHT SIDE CHAPTER NAVIGATION RAIL -->
+    <aside class="chapter-rail" aria-label="Indikator Bab">
+        <a href="#intro" class="rail-dot active" title="01 // Intro"></a>
+        <a href="#karya" class="rail-dot" title="02 // Karya Pilihan"></a>
+        <a href="#harga" class="rail-dot" title="03 // Daftar Harga"></a>
+        <a href="#cara" class="rail-dot" title="04 // Cara Order"></a>
+        <a href="#kontak" class="rail-dot" title="05 // Kontak"></a>
+    </aside>
+
+    <!-- 5. MAIN PER-SECTION ARCHITECTURAL CONTENT -->
+    <main>
+
+        <!-- ===================================================================
+             SECTION 01 // HERO MANIFESTO (#intro)
+             =================================================================== -->
+        <section id="intro" class="igloo-section" data-chapter="SEC // 01 — MANIFESTO">
+            <div class="section-container">
+                <div class="hero-tag-row reveal-up">
+                    <span class="hero-tag">SYS // GRAPHIC STUDIO v2.6</span>
+                    <span class="hero-tag">PRINT-READY SPECIFICATION</span>
+                    <span class="hero-tag">BOGOR, JAWA BARAT — ID</span>
+                </div>
+
+                <h1 class="hero-title reveal-up">
+                    <span class="word-line" data-scramble="Poster.">Poster<span class="accent-dot">.</span></span>
+                    <span class="word-line stroke-word" data-scramble="Jersey.">Jersey<span class="accent-dot">.</span></span>
+                    <span class="word-line" data-scramble="Produk.">Produk<span class="accent-dot">.</span></span>
+                </h1>
+
+                <div class="hero-bottom-grid reveal-up">
+                    <p class="hero-lead">
+                        Desain yang rapi, jelas, dan siap cetak untuk sekolah, tim, dan usaha kecil. Revisi dibahas di awal, hasil dikirim tepat waktu.
+                    </p>
+
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <b>DESIGN SAJA</b>
+                            <span>SIAP SEDIA</span>
+                        </div>
+                        <div class="stat-item">
+                            <b>1–3 Hari</b>
+                            <span>Estimasi Pengerjaan</span>
+                        </div>
+                    </div>
+
+                    <div class="hero-cta-wrap">
+                        <a class="btn-igloo" href="#kontak">
+                            <span>Pesan Desain</span>
+                            <span class="btn-arrow">↗</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================================================================
+             SECTION 02 // KARYA PILIHAN (#karya)
+             =================================================================== -->
+        <section id="karya" class="igloo-section" data-chapter="SEC // 02 — KARYA PILIHAN">
+            <div class="section-container swiss-grid">
+                <!-- Left Column Telemetry -->
+                <div class="sec-meta reveal-up">
+                    <div>
+                        <div class="sec-index-badge">● [ 02 / 05 ] — ARCHIVE</div>
+                        <div class="sec-index-title">Karya pilihan</div>
+                        <p class="sec-index-desc">
+                            Setiap file disusun dengan grid presisi, margin aman percetakan, serta profil warna terkalibrasi.
+                        </p>
+                    </div>
+
+                    <div class="sec-spec-box">
+                        <div>FORMAT: PDF / JPG / CDR / EPS</div>
+                        <div>COLOR PROFILE: CMYK & RGB</div>
+                        <div>INTERACTION: 3D TILT + INSPECT</div>
+                        <button type="button" id="blueprint-toggle" class="hud-btn mt-2" style="width: fit-content;">
+                            <span>⊞ Mode Blueprint: OFF</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Column Content -->
+                <div class="sec-body reveal-up">
+                    <div class="sec-heading-row">
+                        <h2 class="sec-h2">Tiga jenis desain yang saya kerjakan</h2>
+                        <span class="font-mono text-xs text-[var(--fg-secondary)] uppercase tracking-widest">
+                            [ KLIK KARTU UNTUK DETAIL SPESIFIKASI ]
+                        </span>
+                    </div>
+
+                    <div class="works-grid">
+                        <!-- WORK 01: POSTER ACARA -->
+                        <article class="artifact-card" data-work="poster">
+                            <div class="artifact-glare"></div>
+                            <div class="artifact-top-bar">
+                                <span>ARCHIVE // 001</span>
+                                <span>A3 · 300 DPI · CMYK</span>
+                            </div>
+                            <figure class="artifact-figure">
+                                <svg viewBox="0 0 300 400" role="img" aria-label="Contoh poster acara dengan lingkaran merah dan teks besar">
+                                    <rect width="300" height="400" fill="#ffffff" />
+                                    <!-- Subtle Swiss Grid Lines -->
+                                    <line x1="20" y1="0" x2="20" y2="400" stroke="#e5e5e5" stroke-width="1" />
+                                    <line x1="150" y1="0" x2="150" y2="400" stroke="#e5e5e5" stroke-width="1" />
+                                    <line x1="280" y1="0" x2="280" y2="400" stroke="#e5e5e5" stroke-width="1" />
+                                    <line x1="0" y1="200" x2="300" y2="200" stroke="#e5e5e5" stroke-width="1" />
+                                    <!-- Crop Marks -->
+                                    <path d="M12 20 H24 M20 12 V24" stroke="#000" stroke-width="1.5" />
+                                    <path d="M276 20 H288 M280 12 V24" stroke="#000" stroke-width="1.5" />
+                                    <!-- Main Graphic -->
+                                    <circle cx="210" cy="130" r="86" fill="#e30613" />
+                                    <circle cx="210" cy="130" r="52" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-dasharray="4 4" />
+                                    <text x="20" y="38" font-family="JetBrains Mono, monospace" font-weight="600" font-size="9" letter-spacing="1" fill="#000">FESTIVAL TAHUNAN // EDISI 2026</text>
+                                    <text x="20" y="262" font-family="Inter Tight,Helvetica,Arial,sans-serif" font-weight="800" font-size="62" letter-spacing="-3" fill="#000">Lomba</text>
+                                    <text x="20" y="318" font-family="Inter Tight,Helvetica,Arial,sans-serif" font-weight="800" font-size="62" letter-spacing="-3" fill="#000">Seni<tspan fill="#e30613">.</tspan></text>
+                                    <rect x="20" y="340" width="260" height="3" fill="#000" />
+                                    <text x="20" y="366" font-family="Inter Tight,Helvetica,Arial,sans-serif" font-weight="600" font-size="13" fill="#000">12 Desember · Aula Sekolah</text>
+                                    <text x="280" y="366" text-anchor="end" font-family="JetBrains Mono, monospace" font-weight="600" font-size="10" fill="#e30613">FREE ENTRY</text>
+                                </svg>
+                                <span class="artifact-inspect-pill">↗ INSPECT SPEC</span>
+                            </figure>
+                            <figcaption class="artifact-caption">
+                                <div>
+                                    <div class="artifact-title">Poster acara</div>
+                                    <div class="artifact-sub">Contoh karya · Cetak & Digital</div>
+                                </div>
+                                <span class="artifact-year">2026</span>
+                            </figcaption>
+                        </article>
+
+                        <!-- WORK 02: JERSEY TIM -->
+                        <article class="artifact-card" data-work="jersey">
+                            <div class="artifact-glare"></div>
+                            <div class="artifact-top-bar">
+                                <span>ARCHIVE // 002</span>
+                                <span>VECTOR · SUBLIMATION</span>
+                            </div>
+                            <figure class="artifact-figure">
+                                <svg viewBox="0 0 300 400" role="img" aria-label="Contoh desain jersey tim merah hitam">
+                                    <rect width="300" height="400" fill="#ecebe6" />
+                                    <!-- Technical CAD Grid -->
+                                    <line x1="150" y1="30" x2="150" y2="370" stroke="#d0cfc9" stroke-width="1" stroke-dasharray="4 4" />
+                                    <text x="20" y="36" font-family="JetBrains Mono, monospace" font-weight="600" font-size="9" fill="#555">KIT SPEC // HOME — SUBLIMATION</text>
+                                    <!-- Jersey Silhouette -->
+                                    <path d="M95 70 L60 85 L20 150 L55 172 L82 140 L82 340 L218 340 L218 140 L245 172 L280 150 L240 85 L205 70 Q150 118 95 70Z" fill="#ffffff" stroke="#000000" stroke-width="3" />
+                                    <!-- Chest Stripes -->
+                                    <path d="M82 200 H218 V232 H82Z" fill="#e30613" />
+                                    <path d="M82 240 H218 V250 H82Z" fill="#000000" />
+                                    <!-- Collar Trim -->
+                                    <path d="M95 70 Q150 118 205 70" fill="none" stroke="#000000" stroke-width="8" />
+                                    <!-- Crest Shield -->
+                                    <circle cx="188" cy="138" r="11" fill="#e30613" stroke="#000" stroke-width="2" />
+                                    <!-- Typography -->
+                                    <text x="150" y="190" text-anchor="middle" font-family="Inter Tight,Helvetica,Arial,sans-serif" font-weight="800" font-size="40" letter-spacing="-2" fill="#000000">FC 9B</text>
+                                    <text x="150" y="312" text-anchor="middle" font-family="Inter Tight,Helvetica,Arial,sans-serif" font-weight="800" font-size="56" fill="#000000">10</text>
+                                    <text x="20" y="378" font-family="JetBrains Mono, monospace" font-weight="600" font-size="9" fill="#444">FRONT & BACK MOCKUP READY</text>
+                                </svg>
+                                <span class="artifact-inspect-pill">↗ INSPECT SPEC</span>
+                            </figure>
+                            <figcaption class="artifact-caption">
+                                <div>
+                                    <div class="artifact-title">Jersey tim</div>
+                                    <div class="artifact-sub">Contoh karya · Siap Konveksi</div>
+                                </div>
+                                <span class="artifact-year">2026</span>
+                            </figcaption>
+                        </article>
+
+                        <!-- WORK 03: LABEL PRODUK -->
+                        <article class="artifact-card" data-work="label">
+                            <div class="artifact-glare"></div>
+                            <div class="artifact-top-bar">
+                                <span>ARCHIVE // 003</span>
+                                <span>DIE-CUT · PACKAGING</span>
+                            </div>
+                            <figure class="artifact-figure">
+                                <svg viewBox="0 0 300 400" role="img" aria-label="Contoh label kemasan produk makanan">
+                                    <rect width="300" height="400" fill="#e30613" />
+                                    <rect x="20" y="20" width="260" height="360" fill="#ffffff" stroke="#000" stroke-width="2" />
+                                    <text x="36" y="46" font-family="JetBrains Mono, monospace" font-weight="600" font-size="9" letter-spacing="1" fill="#e30613">SNACK NUSANTARA // BATCH 04</text>
+                                    <text x="36" y="88" font-family="Inter Tight,Helvetica,Arial,sans-serif" font-weight="800" font-size="46" letter-spacing="-2" fill="#000000">Keripik</text>
+                                    <text x="36" y="134" font-family="Inter Tight,Helvetica,Arial,sans-serif" font-weight="800" font-size="46" letter-spacing="-2" fill="#000000">Pisang</text>
+                                    <rect x="36" y="154" width="228" height="3" fill="#000000" />
+                                    <circle cx="196" cy="256" r="58" fill="#000000" />
+                                    <circle cx="196" cy="256" r="50" fill="none" stroke="#ffffff" stroke-width="1" stroke-dasharray="3 3" />
+                                    <text x="36" y="216" font-family="Inter Tight,Helvetica,Arial,sans-serif" font-weight="600" font-size="15" fill="#000000">Renyah dan gurih</text>
+                                    <text x="36" y="238" font-family="Inter Tight,Helvetica,Arial,sans-serif" font-weight="500" font-size="14" fill="#555555">Net 150 g</text>
+                                    <!-- Mini Barcode Graphic -->
+                                    <g fill="#000" transform="translate(36, 275)">
+                                        <rect x="0" width="3" height="28" /><rect x="6" width="1.5" height="28" /><rect x="11" width="4" height="28" /><rect x="18" width="2" height="28" /><rect x="23" width="1.5" height="28" /><rect x="28" width="5" height="28" /><rect x="36" width="2" height="28" /><rect x="41" width="3" height="28" />
+                                    </g>
+                                    <text x="196" y="264" text-anchor="middle" font-family="Inter Tight,Helvetica,Arial,sans-serif" font-weight="800" font-size="22" fill="#ffffff">Asli</text>
+                                    <text x="36" y="360" font-family="Inter Tight,Helvetica,Arial,sans-serif" font-weight="600" font-size="13" fill="#000000">Bogor, Jawa Barat</text>
+                                </svg>
+                                <span class="artifact-inspect-pill">↗ INSPECT SPEC</span>
+                            </figure>
+                            <figcaption class="artifact-caption">
+                                <div>
+                                    <div class="artifact-title">Label produk</div>
+                                    <div class="artifact-sub">Contoh karya · Kemasan UMKM</div>
+                                </div>
+                                <span class="artifact-year">2026</span>
+                            </figcaption>
+                        </article>
+                    </div>
+
+                    <p class="mt-5 font-mono text-xs text-[var(--fg-secondary)]">
+                        * Karya di atas adalah contoh. Ganti dengan desain asli kamu, atau minta ditambahkan di versi berikutnya.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================================================================
+             SECTION 03 // DAFTAR HARGA & SIMULATOR (#harga)
+             =================================================================== -->
+        <section id="harga" class="igloo-section" data-chapter="SEC // 03 — DAFTAR HARGA">
+            <div class="section-container swiss-grid">
+                <!-- Left Column Telemetry -->
+                <div class="sec-meta reveal-up">
+                    <div>
+                        <div class="sec-index-badge">● [ 03 / 05 ] — PRICING LEDGER</div>
+                        <div class="sec-index-title">Daftar harga</div>
+                        <p class="sec-index-desc">
+                            Transparan sejak awal. Klik salah satu paket di samping untuk menghitung estimasi DP 50% dan menyiapkan format pesan WhatsApp otomatis.
+                        </p>
+                    </div>
+
+                    <div class="sec-spec-box">
+                        <div>CURRENCY: IDR (RUPIAH)</div>
+                        <div>DOWN PAYMENT: 50% AWAL</div>
+                        <div>EXTRA REVISION: Rp10.000 / KALI</div>
+                    </div>
+                </div>
+
+                <!-- Right Column Interactive Ledger -->
+                <div class="sec-body reveal-up">
+                    <div class="sec-heading-row">
+                        <h2 class="sec-h2">Harga jelas, tanpa biaya tersembunyi</h2>
+                        <span class="font-mono text-xs text-[var(--accent)] uppercase tracking-widest">
+                            [ KLIK BARIS PAKET UNTUK MEMILIH ]
+                        </span>
+                    </div>
+
+                    <div class="ledger-table" role="radiogroup" aria-label="Pilih Paket Desain">
+                        <!-- Row 1: Poster -->
+                        <div class="ledger-row selected" data-pkg="Poster" data-price="35000" tabindex="0" role="radio" aria-checked="true">
+                            <span class="ledger-code">PKG // 01</span>
+                            <h3 class="ledger-name">Poster</h3>
+                            <p class="ledger-desc">1 desain, 2 kali revisi, file JPG dan PDF siap cetak.</p>
+                            <span class="ledger-price">Rp35.000</span>
+                            <div class="ledger-action">
+                                <span class="select-badge">✓ Terpilih</span>
+                            </div>
+                        </div>
+
+                        <!-- Row 2: Jersey -->
+                        <div class="ledger-row" data-pkg="Jersey" data-price="200000" tabindex="0" role="radio" aria-checked="false">
+                            <span class="ledger-code">PKG // 02</span>
+                            <h3 class="ledger-name">Jersey</h3>
+                            <p class="ledger-desc">Depan dan belakang, nama dan nomor, 3 kali revisi, file siap kirim ke konveksi.</p>
+                            <span class="ledger-price">Rp200.000</span>
+                            <div class="ledger-action">
+                                <span class="select-badge">Pilih Paket</span>
+                            </div>
+                        </div>
+
+                        <!-- Row 3: Label dan kemasan -->
+                        <div class="ledger-row" data-pkg="Label dan kemasan" data-price="75000" tabindex="0" role="radio" aria-checked="false">
+                            <span class="ledger-code">PKG // 03</span>
+                            <h3 class="ledger-name">Label dan kemasan</h3>
+                            <p class="ledger-desc">Label produk dengan logo sederhana, 2 kali revisi, ukuran sesuai kebutuhan.</p>
+                            <span class="ledger-price">Rp75.000</span>
+                            <div class="ledger-action">
+                                <span class="select-badge">Pilih Paket</span>
+                            </div>
+                        </div>
+
+                        <!-- Row 4: Paket usaha kecil -->
+                        <div class="ledger-row" data-pkg="Paket usaha kecil" data-price="250000" tabindex="0" role="radio" aria-checked="false">
+                            <span class="ledger-code">PKG // 04</span>
+                            <h3 class="ledger-name">Paket usaha kecil</h3>
+                            <p class="ledger-desc">Logo, label, dan 1 poster promosi dengan gaya yang seragam.</p>
+                            <span class="ledger-price">Rp250.000</span>
+                            <div class="ledger-action">
+                                <span class="select-badge">Pilih Paket</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Live Order Calculator Bar -->
+                    <div class="estimator-bar">
+                        <div>
+                            <div class="font-mono text-[10px] uppercase tracking-widest text-[var(--fg-secondary)]">PAKET AKTIF</div>
+                            <div class="text-lg font-extrabold" id="calc-pkg-name">Poster</div>
+                        </div>
+
+                        <div>
+                            <div class="font-mono text-[10px] uppercase tracking-widest text-[var(--fg-secondary)] mb-1">TAMBAHAN REVISI (+Rp10.000)</div>
+                            <div class="rev-stepper">
+                                <button type="button" class="rev-btn" id="rev-minus" aria-label="Kurangi revisi tambahan">−</button>
+                                <span class="font-mono text-xs font-bold px-2" id="rev-count">0x Ekstra</span>
+                                <button type="button" class="rev-btn" id="rev-plus" aria-label="Tambah revisi tambahan">+</button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="font-mono text-[10px] uppercase tracking-widest text-[var(--fg-secondary)]">ESTIMASI TOTAL (DP 50%)</div>
+                            <div class="font-mono text-xl font-extrabold text-[var(--accent)]">
+                                <span id="calc-total">Rp35.000</span>
+                                <span class="text-xs font-normal text-[var(--fg-secondary)]" id="calc-dp">(DP: Rp17.500)</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <a href="#kontak" class="btn-igloo" style="padding: 12px 20px; font-size: 13px;">
+                                <span>Lanjut Order Paket Ini</span>
+                                <span class="btn-arrow">→</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <p class="mt-4 font-mono text-xs text-[var(--fg-secondary)]">
+                        * Harga bisa berubah sesuai tingkat kerumitan. Revisi tambahan Rp10.000 per kali.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================================================================
+             SECTION 04 // CARA ORDER (#cara)
+             =================================================================== -->
+        <section id="cara" class="igloo-section" data-chapter="SEC // 04 — PROTOKOL ORDER">
+            <div class="section-container swiss-grid">
+                <!-- Left Column Telemetry -->
+                <div class="sec-meta reveal-up">
+                    <div>
+                        <div class="sec-index-badge">● [ 04 / 05 ] — WORKFLOW</div>
+                        <div class="sec-index-title">Cara order</div>
+                        <p class="sec-index-desc">
+                            Alur kerja sistematis dari diskusi ide hingga pengiriman file master siap cetak.
+                        </p>
+                    </div>
+
+                    <div class="sec-spec-box">
+                        <div>SLA: 1 SAMPAI 3 HARI KERJA</div>
+                        <div>PAYMENT: TRANSFER / QRIS / E-WALLET</div>
+                        <div>DELIVERY: GOOGLE DRIVE / WA DOC</div>
+                    </div>
+                </div>
+
+                <!-- Right Column 4-Step Protocol -->
+                <div class="sec-body reveal-up">
+                    <div class="sec-heading-row">
+                        <h2 class="sec-h2">Empat langkah sampai file jadi</h2>
+                        <span class="font-mono text-xs text-[var(--fg-secondary)] uppercase tracking-widest">
+                            [ ESTIMASI WAKTU: 1–3 HARI ]
+                        </span>
+                    </div>
+
+                    <div class="protocol-grid">
+                        <!-- Step 1 -->
+                        <div class="protocol-card">
+                            <div>
+                                <div class="protocol-num">
+                                    <span>01</span>
+                                    <span class="protocol-tag">PHASE // BRIEF</span>
+                                </div>
+                                <p class="protocol-text">
+                                    Kirim pesan lewat WhatsApp: jenis desain, ukuran, dan contoh yang kamu suka.
+                                </p>
+                            </div>
+                            <div class="protocol-foot">OUTPUT: KESEPAKATAN KONSEP</div>
+                        </div>
+
+                        <!-- Step 2 -->
+                        <div class="protocol-card">
+                            <div>
+                                <div class="protocol-num">
+                                    <span>02</span>
+                                    <span class="protocol-tag">PHASE // DEPOSIT</span>
+                                </div>
+                                <p class="protocol-text">
+                                    Setuju harga, lalu bayar DP 50% sebelum pengerjaan dimulai.
+                                </p>
+                            </div>
+                            <div class="protocol-foot">OUTPUT: JADWAL ANTREAN AKTIF</div>
+                        </div>
+
+                        <!-- Step 3 -->
+                        <div class="protocol-card">
+                            <div>
+                                <div class="protocol-num">
+                                    <span>03</span>
+                                    <span class="protocol-tag">PHASE // REVIEW</span>
+                                </div>
+                                <p class="protocol-text">
+                                    Saya kirim draf. Kamu cek, lalu revisi sesuai paket.
+                                </p>
+                            </div>
+                            <div class="protocol-foot">OUTPUT: ASISTENSI & REVISI</div>
+                        </div>
+
+                        <!-- Step 4 -->
+                        <div class="protocol-card">
+                            <div>
+                                <div class="protocol-num">
+                                    <span>04</span>
+                                    <span class="protocol-tag">PHASE // FINAL</span>
+                                </div>
+                                <p class="protocol-text">
+                                    Lunasi sisanya, dan file final langsung dikirim.
+                                </p>
+                            </div>
+                            <div class="protocol-foot">OUTPUT: FILE MASTER SIAP CETAK</div>
+                        </div>
+                    </div>
+
+                    <p class="mt-5 font-mono text-xs text-[var(--fg-secondary)]">
+                        * Waktu pengerjaan umumnya 1 sampai 3 hari, tergantung antrean.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================================================================
+             SECTION 05 // KONTAK & DIRECT TRANSMISSION (#kontak)
+             =================================================================== -->
+        <section id="kontak" class="igloo-section" data-chapter="SEC // 05 — TRANSMISI KONTAK">
+            <div class="section-container swiss-grid">
+                <!-- Left Column Telemetry -->
+                <div class="sec-meta reveal-up">
+                    <div>
+                        <div class="sec-index-badge">● [ 05 / 05 ] — DISPATCH</div>
+                        <div class="sec-index-title">Kontak</div>
+                        <p class="sec-index-desc">
+                            Siap mewujudkan identitas visual untuk acara sekolah, jersey tim, atau kemasan produk UMKM kamu.
+                        </p>
+                    </div>
+
+                    <div class="sec-spec-box">
+                        <div>LOC: BOGOR, JAWA BARAT</div>
+                        <div>RESPONSE TIME: FAST RESPON</div>
+                        <div>© 2026 <span id="footer-studio-name">FATH STUDIO</span></div>
+                    </div>
+                </div>
+
+                <!-- Right Column Monumental Portal -->
+                <div class="sec-body reveal-up">
+                    <div class="contact-portal">
+                        <div class="font-mono text-xs uppercase tracking-widest text-[var(--accent)] mb-2">
+                            ● DIRECT WHATSAPP CHANNEL // READY
+                        </div>
+                        <h2 class="sec-h2">Punya acara, tim, atau produk?</h2>
+
+                        <!-- Dynamic WhatsApp Link that carries selected package info -->
+                        <a id="wa-main-link" class="big-wa-link" href="https://wa.me/6285122675027" target="_blank" rel="noopener">
+                            <span>Chat WhatsApp</span>
+                            <span>↗</span>
+                        </a>
+
+                        <!-- Live Brief Preview Box -->
+                        <div class="p-4 rounded-lg border border-[var(--line-hairline)] bg-[var(--bg-primary)] mb-6">
+                            <div class="flex flex-wrap justify-between items-center gap-2 mb-2">
+                                <span class="font-mono text-[10px] uppercase tracking-widest text-[var(--fg-secondary)]">
+                                    FORMAT PESAN OTOMATIS (TERHUBUNG DENGAN PILIHAN HARGA):
+                                </span>
+                                <button type="button" id="copy-brief-btn" class="hud-btn" style="padding: 3px 9px; font-size: 10px;">
+                                    Salin Format Pesan
+                                </button>
+                            </div>
+                            <p id="brief-preview-text" class="font-mono text-xs text-[var(--fg-primary)] leading-relaxed">
+                                Halo, saya ingin pesan desain *Poster* (Estimasi Rp35.000 / DP 50% Rp17.500). Berikut detail ukuran & referensinya:
+                            </p>
+                        </div>
+
+                        <div class="contact-meta-grid">
+                            <div class="contact-box">
+                                <div class="contact-box-label">WHATSAPP</div>
+                                <div class="contact-box-val">
+                                    <span id="wa-number-display">0851-2267-5027</span>
+                                    <button type="button" class="hud-btn" id="copy-wa-btn" style="padding: 3px 8px; font-size: 10px;">COPY</button>
+                                </div>
+                            </div>
+
+                            <div class="contact-box">
+                                <div class="contact-box-label">INSTAGRAM</div>
+                                <div class="contact-box-val">
+                                    <span id="ig-handle-display">@frnpooke @fathstudioid</span>
+                                    <button type="button" class="hud-btn" id="copy-ig-btn" style="padding: 3px 8px; font-size: 10px;">COPY</button>
+                                </div>
+                            </div>
+
+                            <div class="contact-box">
+                                <div class="contact-box-label">STUDIO BASE</div>
+                                <div class="contact-box-val">
+                                    <span>Bogor, Jawa Barat</span>
+                                    <span class="font-mono text-[10px] text-[var(--accent)]">IDN</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 6. BOTTOM FIXED HUD TELEMETRY BAR -->
+    <footer class="hud-footer">
+        <div class="hud-footer-left">
+            <span>6.5971° S, 106.8060° E // BOGOR</span>
+            <span>·</span>
+            <span id="hud-clock">00:00:00 WIB</span>
+        </div>
+
+        <div class="hud-footer-center">
+            <span id="hud-scroll-pct">SCROLL 000%</span>
+            <div class="scroll-meter">
+                <div class="scroll-meter-fill" id="scroll-bar-fill"></div>
+            </div>
+        </div>
+
+        <div class="hud-footer-right">
+            <span id="hud-active-chapter" class="font-bold text-[var(--fg-primary)]">SEC // 01 — MANIFESTO</span>
+        </div>
+    </footer>
+
+    <!-- 7. MODAL 1: ARTIFACT BLUEPRINT INSPECTOR -->
+    <div class="modal-backdrop" id="artifact-modal" role="dialog" aria-modal="true" aria-labelledby="modal-work-title">
+        <div class="modal-window">
+            <div class="flex justify-between items-center px-6 py-4 border-b border-[var(--line-hairline)] font-mono text-xs">
+                <span id="modal-work-code" class="text-[var(--accent)] font-bold">SPECIFICATION // 001</span>
+                <button type="button" class="hud-btn" id="close-artifact-modal">✕ TUTUP [ESC]</button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 p-6 items-center">
+                <div class="md:col-span-5 bg-[var(--tile-bg)] rounded-lg p-4 border border-[var(--line-hairline)]" id="modal-svg-holder">
+                    <!-- Dynamic SVG Cloned Here -->
+                </div>
+                <div class="md:col-span-7 flex flex-col justify-between space-y-4">
+                    <div>
+                        <div class="font-mono text-xs text-[var(--fg-secondary)] uppercase mb-1" id="modal-work-cat">KATEGORI DESAIN</div>
+                        <h3 class="text-3xl font-extrabold tracking-tight mb-3" id="modal-work-title">Poster Acara</h3>
+                        <p class="text-sm text-[var(--fg-secondary)] leading-relaxed" id="modal-work-desc">
+                            Disusun menggunakan prinsip hierarki tipografi yang tegas agar informasi utama langsung terbaca dari jarak jauh maupun di layar smartphone.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 pt-4 border-t border-[var(--line-hairline)] font-mono text-xs">
+                        <div>
+                            <span class="text-[var(--fg-muted)] block text-[10px]">FILE DELIVERABLES</span>
+                            <strong id="modal-work-files">PDF Siap Cetak & JPG High-Res</strong>
+                        </div>
+                        <div>
+                            <span class="text-[var(--fg-muted)] block text-[10px]">REVISI TERMASUK</span>
+                            <strong id="modal-work-rev">2x Revisi Terarah</strong>
+                        </div>
+                        <div>
+                            <span class="text-[var(--fg-muted)] block text-[10px]">HARGA PAKET</span>
+                            <strong class="text-[var(--accent)]" id="modal-work-price">Rp35.000</strong>
+                        </div>
+                        <div>
+                            <span class="text-[var(--fg-muted)] block text-[10px]">ESTIMASI SELESAI</span>
+                            <strong>1–3 Hari Kerja</strong>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 flex flex-wrap gap-3">
+                        <button type="button" class="btn-igloo" id="modal-select-pkg-btn" style="padding: 12px 20px; font-size: 13px;">
+                            <span>Pilih & Pesan Desain Ini</span>
+                            <span class="btn-arrow">↗</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 8. MODAL 2: STUDIO PROFILE CUSTOMIZER (GANTI NAMA & WA DENGAN MUDAH) -->
+    <div class="modal-backdrop" id="profile-modal" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
+        <div class="modal-window" style="max-width: 520px;">
+            <div class="flex justify-between items-center px-6 py-4 border-b border-[var(--line-hairline)] font-mono text-xs">
+                <span class="text-[var(--accent)] font-bold">STUDIO CONFIG // IDENTITAS KAMU</span>
+                <button type="button" class="hud-btn" id="close-profile-modal">✕ TUTUP</button>
+            </div>
+            <form id="profile-form" class="p-6 space-y-4">
+                <h3 id="profile-modal-title" class="text-xl font-extrabold">Sesuaikan Identitas Portofolio</h3>
+                <p class="text-xs text-[var(--fg-secondary)]">
+                    Ubah nama studio, nomor WhatsApp, dan username Instagram kamu di bawah ini. Perubahan langsung tersimpan di browser.
+                </p>
+
+                <div>
+                    <label class="block font-mono text-[10px] uppercase tracking-wider text-[var(--fg-secondary)] mb-1">FATH STUDIO</label>
+                    <input type="text" id="input-studio-name" value="FATH STUDIO" class="w-full px-3 py-2 rounded bg-[var(--bg-primary)] border border-[var(--line-strong)] text-sm font-semibold focus:outline-none focus:border-[var(--accent)]">
+                </div>
+
+                <div>
+                    <label class="block font-mono text-[10px] uppercase tracking-wider text-[var(--fg-secondary)] mb-1">Nomor WhatsApp (Format 6285122675027)</label>
+                    <input type="text" id="input-wa-num" value="6285122675027" placeholder="Contoh: 6285122675027" class="w-full px-3 py-2 rounded bg-[var(--bg-primary)] border border-[var(--line-strong)] text-sm font-mono focus:outline-none focus:border-[var(--accent)]">
+                </div>
+
+                <div>
+                    <label class="block font-mono text-[10px] uppercase tracking-wider text-[var(--fg-secondary)] mb-1">@fathstudioid</label>
+                    <input type="text" id="input-ig-handle" value="@fathstudioid" class="w-full px-3 py-2 rounded bg-[var(--bg-primary)] border border-[var(--line-strong)] text-sm font-mono focus:outline-none focus:border-[var(--accent)]">
+                </div>
+
+                <div class="pt-2 flex justify-end gap-2">
+                    <button type="submit" class="btn-igloo" style="padding: 10px 20px; font-size: 13px;">
+                        <span>Simpan Perubahan</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="hud-toast" role="status" aria-live="polite">TERSALIN KE CLIPBOARD</div>
+
+    <!-- ==========================================================================
+         9. JAVASCRIPT ENGINE: CANVAS 3D GRID, CIPHER SCRAMBLE, HUD & CONFIGURATOR
+         ========================================================================== -->
+    <script>
+        (function() {
+            'use strict';
+
+            /* ------------------------------------------------------------------
+               A. INTERACTIVE ARCHITECTURAL CANVAS (IGLOO.INC DEPTH GRID)
+               ------------------------------------------------------------------ */
+            const canvas = document.getElementById('bg-canvas');
+            const ctx = canvas.getContext('2d');
+            let width = window.innerWidth;
+            let height = window.innerHeight;
+            let mouseX = width / 2;
+            let mouseY = height / 2;
+            let targetX = width / 2;
+            let targetY = height / 2;
+            let scrollY = window.scrollY;
+
+            const nodes = [];
+            const NODE_COUNT = 38;
+
+            function resizeCanvas() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width * Math.min(window.devicePixelRatio || 1, 2);
+                canvas.height = height * Math.min(window.devicePixelRatio || 1, 2);
+                ctx.scale(Math.min(window.devicePixelRatio || 1, 2), Math.min(window.devicePixelRatio || 1, 2));
+            }
+
+            function initNodes() {
+                nodes.length = 0;
+                for (let i = 0; i < NODE_COUNT; i++) {
+                    nodes.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        vx: (Math.random() - 0.5) * 0.35,
+                        vy: (Math.random() - 0.5) * 0.35,
+                        size: Math.random() > 0.8 ? 3 : 1.5
+                    });
+                }
+            }
+
+            window.addEventListener('resize', () => {
+                resizeCanvas();
+                initNodes();
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                targetX = e.clientX;
+                targetY = e.clientY;
+            });
+
+            function renderCanvas() {
+                ctx.clearRect(0, 0, width, height);
+
+                mouseX += (targetX - mouseX) * 0.06;
+                mouseY += (targetY - mouseY) * 0.06;
+
+                const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+                const strokeColor = isLight ? 'rgba(9, 10, 12, 0.055)' : 'rgba(244, 244, 246, 0.045)';
+                const nodeColor = isLight ? 'rgba(9, 10, 12, 0.25)' : 'rgba(244, 244, 246, 0.22)';
+
+                // Draw subtle reactive structural grid lines
+                const gridSize = 110;
+                const offsetX = ((mouseX - width / 2) * -0.025) % gridSize;
+                const offsetY = ((mouseY - height / 2) * -0.025 - scrollY * 0.12) % gridSize;
+
+                ctx.strokeStyle = strokeColor;
+                ctx.lineWidth = 1;
+
+                ctx.beginPath();
+                for (let x = offsetX; x < width; x += gridSize) {
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, height);
+                }
+                for (let y = offsetY; y < height; y += gridSize) {
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(width, y);
+                }
+                ctx.stroke();
+
+                // Draw floating telemetry nodes & proximity links
+                for (let i = 0; i < nodes.length; i++) {
+                    const n = nodes[i];
+                    n.x += n.vx;
+                    n.y += n.vy;
+
+                    if (n.x < 0) n.x = width;
+                    if (n.x > width) n.x = 0;
+                    if (n.y < 0) n.y = height;
+                    if (n.y > height) n.y = 0;
+
+                    const dx = mouseX - n.x;
+                    const dy = mouseY - n.y;
+                    const dist = Math.hypot(dx, dy);
+
+                    // Draw small node cross or dot
+                    ctx.fillStyle = dist < 180 ? '#e30613' : nodeColor;
+                    ctx.fillRect(n.x - n.size / 2, n.y - n.size / 2, n.size, n.size);
+
+                    if (dist < 170) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(227, 6, 19, ${(1 - dist / 170) * 0.28})`;
+                        ctx.moveTo(n.x, n.y);
+                        ctx.lineTo(mouseX, mouseY);
+                        ctx.stroke();
+                    }
+                }
+
+                requestAnimationFrame(renderCanvas);
+            }
+
+            resizeCanvas();
+            initNodes();
+            requestAnimationFrame(renderCanvas);
+
+            /* ------------------------------------------------------------------
+               B. CIPHER TEXT SCRAMBLE ENGINE (IGLOO.INC SIGNATURE EFFECT)
+               ------------------------------------------------------------------ */
+            const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789//[]—_';
+
+            function scrambleText(el, finalString, duration = 420) {
+                if (!el) return;
+                let frame = 0;
+                const totalFrames = Math.round(duration / 16);
+                const timer = setInterval(() => {
+                    frame++;
+                    const progress = frame / totalFrames;
+                    const revealCount = Math.floor(finalString.length * progress);
+                    let output = '';
+                    for (let i = 0; i < finalString.length; i++) {
+                        if (finalString[i] === ' ') {
+                            output += ' ';
+                        } else if (i < revealCount) {
+                            output += finalString[i];
+                        } else {
+                            output += CHARS[Math.floor(Math.random() * CHARS.length)];
+                        }
+                    }
+                    el.textContent = output;
+                    if (frame >= totalFrames) {
+                        clearInterval(timer);
+                        el.textContent = finalString;
+                    }
+                }, 16);
+            }
+
+            /* ------------------------------------------------------------------
+               C. SCROLL SPY, REVEAL ANIMATIONS & HUD TELEMETRY
+               ------------------------------------------------------------------ */
+            const sections = document.querySelectorAll('.igloo-section');
+            const navLinks = document.querySelectorAll('.hud-nav a');
+            const railDots = document.querySelectorAll('.rail-dot');
+            const activeChapterEl = document.getElementById('hud-active-chapter');
+            const scrollPctEl = document.getElementById('hud-scroll-pct');
+            const scrollFillEl = document.getElementById('scroll-bar-fill');
+            let currentChapter = '';
+
+            // Reveal elements on scroll
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.14
+            });
+
+            document.querySelectorAll('.reveal-up').forEach((el) => revealObserver.observe(el));
+
+            // Section tracking observer
+            const sectionObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        const chapterName = entry.target.getAttribute('data-chapter');
+
+                        navLinks.forEach((link) => {
+                            link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+                        });
+
+                        railDots.forEach((dot) => {
+                            dot.classList.toggle('active', dot.getAttribute('href') === '#' + id);
+                        });
+
+                        if (chapterName && chapterName !== currentChapter) {
+                            currentChapter = chapterName;
+                            scrambleText(activeChapterEl, chapterName, 380);
+                        }
+                    }
+                });
+            }, {
+                threshold: 0.42
+            });
+
+            sections.forEach((sec) => sectionObserver.observe(sec));
+
+            window.addEventListener('scroll', () => {
+                scrollY = window.scrollY;
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                const pct = docHeight > 0 ? Math.min(100, Math.max(0, Math.round((scrollY / docHeight) * 100))) : 0;
+                scrollPctEl.textContent = 'SCROLL ' + String(pct).padStart(3, '0') + '%';
+                scrollFillEl.style.width = pct + '%';
+            }, {
+                passive: true
+            });
+
+            // Live WIB Clock
+            const clockEl = document.getElementById('hud-clock');
+
+            function updateClock() {
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('id-ID', {
+                    hour12: false,
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+                clockEl.textContent = timeStr.replace(/\./g, ':') + ' WIB';
+            }
+            setInterval(updateClock, 1000);
+            updateClock();
+
+            /* ------------------------------------------------------------------
+               D. 3D ARTIFACT TILT & BLUEPRINT SPECIFICATION MODAL
+               ------------------------------------------------------------------ */
+            const WORK_SPECS = {
+                poster: {
+                    code: 'ARCHIVE // 001 — PRINT & DIGITAL POSTER',
+                    cat: 'POSTER ACARA & PROMOSI',
+                    title: 'Poster acara (Lomba Seni)',
+                    desc: 'Komposisi poster bergaya Swiss International dengan kontras tipografi tinggi, penataan informasi tanggal/lokasi yang terstruktur, dan profil warna siap cetak.',
+                    files: 'JPG High-Res + PDF Siap Cetak',
+                    rev: '2 Kali Revisi',
+                    price: 'Rp35.000',
+                    pkgName: 'Poster',
+                    pkgPrice: 35000
+                },
+                jersey: {
+                    code: 'ARCHIVE // 002 — SPORTSWEAR APPAREL',
+                    cat: 'DESAIN JERSEY TIM & KELAS',
+                    title: 'Jersey tim (FC 9B · No. 10)',
+                    desc: 'Desain tampak depan dan belakang lengkap dengan penomoran punggung, nama pemain, serta garis pola siap kirim langsung ke vendor konveksi atau sublimasi.',
+                    files: 'File Master Siap Konveksi (CDR/PDF/PNG)',
+                    rev: '3 Kali Revisi',
+                    price: 'Rp200.000',
+                    pkgName: 'Jersey',
+                    pkgPrice: 200000
+                },
+                label: {
+                    code: 'ARCHIVE // 003 — PACKAGING DESIGN',
+                    cat: 'LABEL & KEMASAN UMKM',
+                    title: 'Label produk (Keripik Pisang)',
+                    desc: 'Desain label kemasan produk yang menonjolkan identitas merek, berat bersih, keunggulan produk, dan tata letak bersih agar terlihat profesional di rak penjualan.',
+                    files: 'File Siap Cetak Sesuai Ukuran Kemasan',
+                    rev: '2 Kali Revisi',
+                    price: 'Rp75.000',
+                    pkgName: 'Label dan kemasan',
+                    pkgPrice: 75000
+                }
+            };
+
+            const artifactCards = document.querySelectorAll('.artifact-card');
+            const artifactModal = document.getElementById('artifact-modal');
+            const modalSvgHolder = document.getElementById('modal-svg-holder');
+            let activeModalWorkKey = 'poster';
+
+            artifactCards.forEach((card) => {
+                const glare = card.querySelector('.artifact-glare');
+
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+
+                    const rotateX = ((y - centerY) / centerY) * -6;
+                    const rotateY = ((x - centerX) / centerX) * 6;
+
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
+                    if (glare) {
+                        glare.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.18), transparent 65%)`;
+                    }
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0)';
+                });
+
+                card.addEventListener('click', () => {
+                    const key = card.getAttribute('data-work');
+                    const spec = WORK_SPECS[key];
+                    if (!spec) return;
+
+                    activeModalWorkKey = key;
+                    document.getElementById('modal-work-code').textContent = spec.code;
+                    document.getElementById('modal-work-cat').textContent = spec.cat;
+                    document.getElementById('modal-work-title').textContent = spec.title;
+                    document.getElementById('modal-work-desc').textContent = spec.desc;
+                    document.getElementById('modal-work-files').textContent = spec.files;
+                    document.getElementById('modal-work-rev').textContent = spec.rev;
+                    document.getElementById('modal-work-price').textContent = spec.price;
+
+                    const svgClone = card.querySelector('svg').cloneNode(true);
+                    modalSvgHolder.innerHTML = '';
+                    modalSvgHolder.appendChild(svgClone);
+
+                    artifactModal.classList.add('open');
+                });
+            });
+
+            document.getElementById('close-artifact-modal').addEventListener('click', () => {
+                artifactModal.classList.remove('open');
+            });
+
+            document.getElementById('modal-select-pkg-btn').addEventListener('click', () => {
+                const spec = WORK_SPECS[activeModalWorkKey];
+                if (spec) {
+                    selectPackageByName(spec.pkgName);
+                }
+                artifactModal.classList.remove('open');
+                document.getElementById('kontak').scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+
+            // Blueprint Mode Toggle
+            const blueprintBtn = document.getElementById('blueprint-toggle');
+            blueprintBtn.addEventListener('click', () => {
+                const active = document.body.classList.toggle('blueprint-mode');
+                blueprintBtn.innerHTML = `<span>⊞ Mode Blueprint: ${active ? 'ON' : 'OFF'}</span>`;
+            });
+
+            /* ------------------------------------------------------------------
+               E. INTERACTIVE PRICING LEDGER & WHATSAPP BRIEF GENERATOR
+               ------------------------------------------------------------------ */
+            let selectedPackage = 'Poster';
+            let basePrice = 35000;
+            let extraRevisions = 0;
+            let studioWaNumber = '62XXXXXXXXXX';
+
+            const ledgerRows = document.querySelectorAll('.ledger-row');
+            const calcPkgName = document.getElementById('calc-pkg-name');
+            const calcTotal = document.getElementById('calc-total');
+            const calcDp = document.getElementById('calc-dp');
+            const revCountEl = document.getElementById('rev-count');
+            const briefPreviewText = document.getElementById('brief-preview-text');
+            const waMainLink = document.getElementById('wa-main-link');
+
+            function formatRupiah(num) {
+                return 'Rp' + num.toLocaleString('id-ID');
+            }
+
+            function updateOrderSummary() {
+                const total = basePrice + extraRevisions * 10000;
+                const dp = Math.round(total / 2);
+
+                calcPkgName.textContent = selectedPackage;
+                revCountEl.textContent = extraRevisions + 'x Ekstra';
+                calcTotal.textContent = formatRupiah(total);
+                calcDp.textContent = `(DP 50%: ${formatRupiah(dp)})`;
+
+                const revNote = extraRevisions > 0 ? ` + ${extraRevisions}x revisi tambahan` : '';
+                const message = `Halo, saya ingin pesan desain *${selectedPackage}*${revNote} (Estimasi ${formatRupiah(total)} / DP 50% ${formatRupiah(dp)}). Berikut detail ukuran & referensinya:`;
+
+                briefPreviewText.textContent = message;
+                const cleanWa = studioWaNumber.replace(/[^0-9]/g, '') || '62XXXXXXXXXX';
+                waMainLink.href = `https://wa.me/${cleanWa}?text=${encodeURIComponent(message)}`;
+            }
+
+            function selectPackageByName(pkgName) {
+                ledgerRows.forEach((row) => {
+                    const isMatch = row.getAttribute('data-pkg') === pkgName;
+                    row.classList.toggle('selected', isMatch);
+                    row.setAttribute('aria-checked', isMatch ? 'true' : 'false');
+                    const badge = row.querySelector('.select-badge');
+                    if (badge) {
+                        badge.textContent = isMatch ? '✓ Terpilih' : 'Pilih Paket';
+                    }
+                    if (isMatch) {
+                        selectedPackage = pkgName;
+                        basePrice = parseInt(row.getAttribute('data-price'), 10) || 35000;
+                    }
+                });
+                updateOrderSummary();
+            }
+
+            ledgerRows.forEach((row) => {
+                row.addEventListener('click', () => {
+                    selectPackageByName(row.getAttribute('data-pkg'));
+                });
+                row.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        selectPackageByName(row.getAttribute('data-pkg'));
+                    }
+                });
+            });
+
+            document.getElementById('rev-minus').addEventListener('click', () => {
+                if (extraRevisions > 0) {
+                    extraRevisions--;
+                    updateOrderSummary();
+                }
+            });
+
+            document.getElementById('rev-plus').addEventListener('click', () => {
+                if (extraRevisions < 10) {
+                    extraRevisions++;
+                    updateOrderSummary();
+                }
+            });
+
+            /* ------------------------------------------------------------------
+               F. THEME SWITCHER, CLIPBOARD & STUDIO PROFILE CUSTOMIZER
+               ------------------------------------------------------------------ */
+            const themeBtn = document.getElementById('theme-toggle');
+            const themeLabel = document.getElementById('theme-label');
+
+            themeBtn.addEventListener('click', () => {
+                const root = document.documentElement;
+                const current = root.getAttribute('data-theme');
+                const next = current === 'light' ? 'dark' : 'light';
+                root.setAttribute('data-theme', next);
+                themeLabel.textContent = next === 'light' ? '◑ DARK' : '◐ LIGHT';
+            });
+
+            // Toast helper
+            const toastEl = document.getElementById('hud-toast');
+            let toastTimer = null;
+
+            function showToast(msg) {
+                toastEl.textContent = msg;
+                toastEl.classList.add('show');
+                clearTimeout(toastTimer);
+                toastTimer = setTimeout(() => {
+                    toastEl.classList.remove('show');
+                }, 2400);
+            }
+
+            function copyText(text, label) {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                try {
+                    document.execCommand('copy');
+                    showToast(label + ' DISALIN KE CLIPBOARD');
+                } catch (err) {
+                    showToast('GAGAL MENYALIN');
+                }
+                document.body.removeChild(ta);
+            }
+
+            document.getElementById('copy-brief-btn').addEventListener('click', () => {
+                copyText(briefPreviewText.textContent, 'FORMAT PESAN ORDER');
+            });
+
+            document.getElementById('copy-wa-btn').addEventListener('click', () => {
+                copyText(document.getElementById('wa-number-display').textContent, 'NOMOR WHATSAPP');
+            });
+
+            document.getElementById('copy-ig-btn').addEventListener('click', () => {
+                copyText(document.getElementById('ig-handle-display').textContent, 'USERNAME INSTAGRAM');
+            });
+
+            // Studio Identity Customizer Modal
+            const profileModal = document.getElementById('profile-modal');
+            document.getElementById('edit-studio-btn').addEventListener('click', () => {
+                profileModal.classList.add('open');
+            });
+            document.getElementById('close-profile-modal').addEventListener('click', () => {
+                profileModal.classList.remove('open');
+            });
+
+            document.getElementById('profile-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const newName = document.getElementById('input-studio-name').value.trim() || 'FATH STUDIO';
+                const newWa = document.getElementById('input-wa-num').value.trim() || '6285122675027';
+                const newIg = document.getElementById('input-ig-handle').value.trim() || '@fathstudioid';
+
+                document.getElementById('studio-name-display').textContent = newName;
+                document.getElementById('footer-studio-name').textContent = newName;
+                document.getElementById('wa-number-display').textContent = newWa;
+                document.getElementById('ig-handle-display').textContent = newIg;
+                studioWaNumber = newWa;
+
+                updateOrderSummary();
+                profileModal.classList.remove('open');
+                showToast('IDENTITAS STUDIO DIPERBARUI');
+            });
+
+            // Close modals on Escape or backdrop click
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    artifactModal.classList.remove('open');
+                    profileModal.classList.remove('open');
+                }
+            });
+
+            [artifactModal, profileModal].forEach((modal) => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) modal.classList.remove('open');
+                });
+            });
+
+            updateOrderSummary();
+        })();
+    </script>
+</body>
+
+</html>
